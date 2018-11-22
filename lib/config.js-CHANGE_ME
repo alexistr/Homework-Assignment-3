@@ -11,7 +11,7 @@
    'httpPort' : 3000,
    'envName' : 'staging',
    'hashingSecret' : 'This is a secret',
-   'strip' : {"public":"YOUR_STRIPE_PUB_KEY","secret":"YOUR_STRIPE_SECRET_KEY"},
+   'strip' : {"secret":"YOUR_STRIPE_SECRET_KEY"},
    'mailgun' : {
      'domain' : 'YOUR_MAILGUN_SANDBOX_DOMAIN',
      'apikey' : 'YOUR_MAILGUN_API_KEY'
