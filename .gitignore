@@ -61,7 +61,7 @@ typings/
 .next
 
 #data dir
-.data/users
-.data/tokens
-.data/orders
+.data/users/
+.data/tokens/
+.data/orders/
 lib/config.js
