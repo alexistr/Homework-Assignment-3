@@ -7,7 +7,7 @@ YOUR_MAILGUN_SANDBOX_DOMAIN,
 YOUR_MAILGUN_API_KEY,
 with your own value.
 
-*Create user*:
+##Create user:
 users/post
 Required: firstName, lastName, email, address, password
 
