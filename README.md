@@ -63,7 +63,7 @@ Required data: id (token id)
 ## Get the available pizzas from the menu
 ### url: /menu
 ### method: GET
-Required data: none (+authorization token)
+Required data: email (+authorization token)
 
 # Shopping
 ## Choose pizza and put it in the cart
