@@ -13,7 +13,7 @@
    'hashingSecret' : 'This is a secret',
    'strip' : {"secret":"YOUR_STRIPE_SECRET_KEY"},
    'mailgun' : {
-     'domain' : 'YOUR_MAILGUN_SANDBOX_DOMAIN',
+     'domain' : 'YOUR_MAILGUN_DOMAIN',
      'apikey' : 'YOUR_MAILGUN_API_KEY'
    }
  };
