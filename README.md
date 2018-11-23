@@ -38,7 +38,7 @@ Optional data : one of firstName, lastName, email, address, password
 Required: user email (+authorization token)
 
 # Tokens
-## Create a token or a user
+## Create a token for a user
 ### url: /tokens
 ### method: POST
 Required data: email,password
