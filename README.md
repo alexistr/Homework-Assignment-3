@@ -87,7 +87,7 @@ Required data: email,pizza (+authorization token)
 ### method: POST
 Required data: email,stripeToken (use tok_visa for testing) (+authorization token)
 
-## Retrieve all the orders for a custumer
+## Retrieve all the orders for a user
 ### url: /order
 ### method: GET
 Required data: email (+authorization token)
