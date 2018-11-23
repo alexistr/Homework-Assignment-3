@@ -12,7 +12,7 @@ with your own values.
 The menu is hard coded in lib/menu.js.
 Obviously you'll need a stripe and a mailgun account.
 
-Then you can :
+start the API with node index.js then you can :
 
 # Users
 ## Create user:
