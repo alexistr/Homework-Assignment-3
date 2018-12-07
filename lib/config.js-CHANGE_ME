@@ -15,6 +15,12 @@
    'mailgun' : {
      'domain' : 'YOUR_MAILGUN_DOMAIN',
      'apikey' : 'YOUR_MAILGUN_API_KEY'
+   },
+   'templateGlobals' : {
+   'appName' : 'Don Pietro online order',
+   'compagnyName' : 'Don Pietro, Inc',
+   'yearCreated' : '2018',
+   'baseUrl' : 'http://localhost:3000/'
    }
  };
 
@@ -28,6 +34,12 @@
    'mailgun' : {
      'domain' : 'YOUR_MAILGUN_SANDBOX_DOMAIN',
      'apikey' : 'YOUR_MAILGUN_API_KEY'
+   },
+   'templateGlobals' : {
+   'appName' : 'Don Pietro online order',
+   'compagnyName' : 'Don Pietro, Inc',
+   'yearCreated' : '2018',
+   'baseUrl' : 'http://localhost:5000/'
    }
 };
 
