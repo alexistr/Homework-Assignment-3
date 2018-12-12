@@ -12,11 +12,8 @@ body,p,h1,h2,h3,h4,h5,h6,div,span,header,footer,img,a,a:hover,a:active,a:visited
   font-size: 12px;
   font-weight: normal;
   text-decoration: none;
-  color: #e00615;
+  color: #1a1a1a;
   border-width: 0;
-}
-body {
-background: url(background.jpg) no-repeat center center fixed;
 }
 
 .clear{
@@ -77,7 +74,7 @@ body.loggedIn .header ul li.loggedOut{
 }
 
 .header .logo img{
-    width: 200px;
+    width: 50px;
 }
 
 .content {
@@ -88,17 +85,16 @@ body.loggedIn .header ul li.loggedOut{
 
 .footer{
   width: 100%;
-  background-color: #ffffff;
+  background-color: #1a1a1a;
   padding: 50px 0;
   text-align: center;
   border-width: 1px 0 0 0;
   border-color: #fff;
   border-style: solid;
-  bottom: 0;
 }
 
 .footer .copyright{
-  color: #007A27;
+  color: #fff;
   font-size: 10px;
 }
 
@@ -138,8 +134,8 @@ body.index .blurb{
 }
 
 .cta,a.cta:hover,a.cta:active,a.cta:visited,button.cta:hover,button.cta:active,button.cta:visited{
-  background-color: #e00615;
-  color: #e00615;
+  background-color: #1a1a1a;
+  color: #fff;
   border-radius: 10px;
   text-transform: uppercase;
   font-weight: bold;
@@ -172,10 +168,6 @@ body.index .blurb{
 }
 
 /* Form Styling for Account Creation page and others */
-form {
-  background-color: rgba(255, 255, 255, 0.5);
-  padding: 10px;
-}
 .formWrapper{
   margin: 0 auto;
   max-width: 500px;
@@ -237,7 +229,7 @@ input.disabled{
 
 .inputLabel{
   padding: 0 0 5px 0;
-  color: #007A27;
+  color: #808080;
 }
 
 .backButton{

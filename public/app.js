@@ -113,7 +113,7 @@ app.logUserOut = function(redirectUser){
 
     // Send the user to the logged out page
     if(redirectUser){
-    //  window.location = '/session/deleted';
+      window.location = '/session/deleted';
     }
 
   });
@@ -383,12 +383,12 @@ app.loadAccountEditPage = function(){
         // Put the data into the forms as values where needed
         document.querySelector("#accountEdit1 .firstNameInput").value = responsePayload.firstName;
         document.querySelector("#accountEdit1 .lastNameInput").value = responsePayload.lastName;
-        document.querySelector("#accountEdit1 .displayPhoneInput").value = responsePayload.phone;
+        document.querySelector("#accountEdit1 .displayEmailInput").value = responsePayload.email;
 
-        // Put the hidden phone field into both forms
-        var hiddenPhoneInputs = document.querySelectorAll("input.hiddenPhoneNumberInput");
-        for(var i = 0; i < hiddenPhoneInputs.length; i++){
-            hiddenPhoneInputs[i].value = responsePayload.phone;
+        // Put the hidden email field into both forms
+        var hiddenEmailInputs = document.querySelectorAll("input.hiddenEmailNumberInput");
+        for(var i = 0; i < hiddenEmailInputs.length; i++){
+            hiddenEmailInputs[i].value = responsePayload.email;
         }
 
       } else {
