@@ -244,7 +244,7 @@ app.formResponseProcessor = function(formId,requestPayload,responsePayload){
   // If login was successful, set the token in localstorage and redirect the user
   if(formId == 'sessionCreate'){
     app.setSessionToken(responsePayload);
-    window.location = '/';
+    window.location = '/menu/show';
   }
 
   // If forms saved successfully and they have success messages, show them
@@ -359,13 +359,13 @@ app.loadDataOnPage = function(){
   }
 
   // Logic for dashboard page
-  if(primaryClass == 'checksList'){
-    app.loadChecksListPage();
+  if(primaryClass == 'menuShow'){
+    app.loadMenuShowPage();
   }
 
   // Logic for check details page
-  if(primaryClass == 'checksEdit'){
-    app.loadChecksEditPage();
+  if(primaryClass == 'cartShow'){
+    app.loadCartShowPage();
   }
 };
 
@@ -401,8 +401,50 @@ app.loadAccountEditPage = function(){
   }
 };
 
-// Load the dashboard page specifically
-app.loadChecksListPage = function(){
+// Load the menu show page specifically
+app.loadMenuShowPage = function(){
+  // Get the email number from the current token, or log the user out if none is there
+  var email = typeof(app.config.sessionToken.email) == 'string' ? app.config.sessionToken.email : false;
+  if(email){
+    // Fetch the user data
+    var queryStringObject = {
+      'email' : email
+    };
+    app.client.request(undefined,'api/menu','GET',queryStringObject,undefined,function(statusCode,responsePayload){
+      if(statusCode == 200){
+
+        // Determine how many checks the user has
+        var menu = typeof(responsePayload) == 'object' && responsePayload instanceof Array && responsePayload.length > 0 ? responsePayload : [];
+        if(menu.length > 0){
+
+          // Show each created check as a new row in the table
+          menu.forEach(function(item){
+            // Put the menu item data into a table row
+            var table = document.getElementById("MenuTable");
+            var tr = table.insertRow(-1);
+            tr.classList.add('itemRow');
+            var td0 = tr.insertCell(0);
+            var td1 = tr.insertCell(1);
+            var td2 = tr.insertCell(2);
+            td0.innerHTML = item.pizza;
+            td1.innerHTML = item.price;
+            td2.innerHTML = '<a href="#" name="orderLink" id="' + item.pizza + '">Order!</a>';
+            });
+
+            app.addItem();
+
+        }
+      } else {
+        // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
+        app.logUserOut();
+      }
+    });
+  } else {
+    app.logUserOut();
+  }
+};
+// Load the cart show page specifically
+app.loadCartShowPage = function(){
   // Get the email number from the current token, or log the user out if none is there
   var email = typeof(app.config.sessionToken.email) == 'string' ? app.config.sessionToken.email : false;
   if(email){
@@ -412,53 +454,25 @@ app.loadChecksListPage = function(){
     };
     app.client.request(undefined,'api/users','GET',queryStringObject,undefined,function(statusCode,responsePayload){
       if(statusCode == 200){
-
-        // Determine how many checks the user has
-        var allChecks = typeof(responsePayload.checks) == 'object' && responsePayload.checks instanceof Array && responsePayload.checks.length > 0 ? responsePayload.checks : [];
-        if(allChecks.length > 0){
-
-          // Show each created check as a new row in the table
-          allChecks.forEach(function(checkId){
-            // Get the data for the check
-            var newQueryStringObject = {
-              'id' : checkId
-            };
-            app.client.request(undefined,'api/checks','GET',newQueryStringObject,undefined,function(statusCode,responsePayload){
-              if(statusCode == 200){
-                var checkData = responsePayload;
-                // Make the check data into a table row
-                var table = document.getElementById("checksListTable");
-                var tr = table.insertRow(-1);
-                tr.classList.add('checkRow');
-                var td0 = tr.insertCell(0);
-                var td1 = tr.insertCell(1);
-                var td2 = tr.insertCell(2);
-                var td3 = tr.insertCell(3);
-                var td4 = tr.insertCell(4);
-                td0.innerHTML = responsePayload.method.toUpperCase();
-                td1.innerHTML = responsePayload.protocol+'://';
-                td2.innerHTML = responsePayload.url;
-                var state = typeof(responsePayload.state) == 'string' ? responsePayload.state : 'unknown';
-                td3.innerHTML = state;
-                td4.innerHTML = '<a href="/checks/edit?id='+responsePayload.id+'">View / Edit / Delete</a>';
-              } else {
-                console.log("Error trying to load check ID: ",checkId);
-              }
+        // Determine how many item user has chosen
+        var cartContent = typeof(responsePayload.cart) == 'object' && responsePayload.cart instanceof Array && responsePayload.cart.length > 0 ? responsePayload.cart : [];
+        if(cartContent.length > 0){
+//@TODO group similare pizzas
+          // Show each chosen item as a new row in the table
+          cartContent.forEach(function(item){
+            // Put the menu item data into a table row
+            var table = document.getElementById("cartTable");
+            var tr = table.insertRow(-1);
+            tr.classList.add('itemRow');
+            var td0 = tr.insertCell(0);
+            var td1 = tr.insertCell(1);
+            var td2 = tr.insertCell(2);
+            td0.innerHTML = item.pizza;
+            td1.innerHTML = item.price;
+            td2.innerHTML = '<a href="#" name="cartLink" id="' + item.pizza + '">Delete</a>';
             });
-          });
 
-          if(allChecks.length < 5){
-            // Show the createCheck CTA
-            document.getElementById("createCheckCTA").style.display = 'block';
-          }
-
-        } else {
-          // Show 'you have no checks' message
-          document.getElementById("noChecksMessage").style.display = 'table-row';
-
-          // Show the createCheck CTA
-          document.getElementById("createCheckCTA").style.display = 'block';
-
+            app.deleteItemFromCart();
         }
       } else {
         // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
@@ -471,47 +485,6 @@ app.loadChecksListPage = function(){
 };
 
 
-// Load the checks edit page specifically
-app.loadChecksEditPage = function(){
-  // Get the check id from the query string, if none is found then redirect back to dashboard
-  var id = typeof(window.location.href.split('=')[1]) == 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false;
-  if(id){
-    // Fetch the check data
-    var queryStringObject = {
-      'id' : id
-    };
-    app.client.request(undefined,'api/checks','GET',queryStringObject,undefined,function(statusCode,responsePayload){
-      if(statusCode == 200){
-
-        // Put the hidden id field into both forms
-        var hiddenIdInputs = document.querySelectorAll("input.hiddenIdInput");
-        for(var i = 0; i < hiddenIdInputs.length; i++){
-            hiddenIdInputs[i].value = responsePayload.id;
-        }
-
-        // Put the data into the top form as values where needed
-        document.querySelector("#checksEdit1 .displayIdInput").value = responsePayload.id;
-        document.querySelector("#checksEdit1 .displayStateInput").value = responsePayload.state;
-        document.querySelector("#checksEdit1 .protocolInput").value = responsePayload.protocol;
-        document.querySelector("#checksEdit1 .urlInput").value = responsePayload.url;
-        document.querySelector("#checksEdit1 .methodInput").value = responsePayload.method;
-        document.querySelector("#checksEdit1 .timeoutInput").value = responsePayload.timeoutSeconds;
-        var successCodeCheckboxes = document.querySelectorAll("#checksEdit1 input.successCodesInput");
-        for(var i = 0; i < successCodeCheckboxes.length; i++){
-          if(responsePayload.successCodes.indexOf(parseInt(successCodeCheckboxes[i].value)) > -1){
-            successCodeCheckboxes[i].checked = true;
-          }
-        }
-      } else {
-        // If the request comes back as something other than 200, redirect back to dashboard
-        window.location = '/checks/all';
-      }
-    });
-  } else {
-    window.location = '/checks/all';
-  }
-};
-
 // Loop to renew token often
 app.tokenRenewalLoop = function(){
   setInterval(function(){
@@ -523,6 +496,93 @@ app.tokenRenewalLoop = function(){
   },1000 * 60);
 };
 
+// Shopping Logic
+// Add the clicked item to the user shopping cart
+app.addItem = function() {
+  //Check we can acces the needed args (email)
+  email = typeof(app.config.sessionToken.email) == 'string' ? app.config.sessionToken.email : false;
+  if(email) {
+  //Get the items
+  var itemsList = document.getElementsByName('orderLink');
+  if(itemsList.length > 0) {
+    //Bind to te click event
+    itemsList.forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        //get pizza name
+        pizza = typeof(e.target.id) == 'string' && e.target.id.length > 0 ? e.target.id : false;
+        if(pizza) {
+          //creating payload
+          payload = {
+            'pizza': pizza,
+            'email': email
+          };
+          app.client.request(undefined,'api/shopping','POST',undefined,payload,function(statusCode,responsePayload){
+            // Display an error on the form if needed
+            if(statusCode == 200){
+
+            } else {
+
+            }
+          });
+        } else {
+          //We should have had a pizza name here!
+          app.logUserOut();
+        }
+      });
+    });
+  } else {
+    // No orderLink) Thats not suppose to be
+    app.logUserOut();
+  }
+} else {
+  // No email
+  app.logUserOut();
+}
+};
+
+app.deleteItemFromCart = function() {  //Check we can acces the needed args (email)
+  email = typeof(app.config.sessionToken.email) == 'string' ? app.config.sessionToken.email : false;
+  if(email) {
+  //Get the items
+  var itemsList = document.getElementsByName('cartLink');
+  if(itemsList.length > 0) {
+    //Bind to te click event
+    itemsList.forEach(function(item) {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        //get pizza name
+        pizza = typeof(e.target.id) == 'string' && e.target.id.length > 0 ? e.target.id : false;
+        if(pizza) {
+          //creating payload
+          payload = {
+            'pizza': pizza,
+            'email': email
+          };
+          app.client.request(undefined,'api/shopping','PUT',undefined,payload,function(statusCode,responsePayload){
+            // Display an error on the form if needed
+            if(statusCode == 200){
+              //Reload page if delete succeed.
+              window.location = 'cart/show';
+            } else {
+              //Display error
+            }
+          });
+        } else {
+          //We should have had a pizza name here!
+          app.logUserOut();
+        }
+      });
+    });
+  } else {
+    // No orderLink) Thats not suppose to be
+    app.logUserOut();
+  }
+} else {
+  // No email
+  app.logUserOut();
+}
+};
 // Init (bootstrapping)
 app.init = function(){
 
@@ -542,7 +602,6 @@ app.init = function(){
   app.loadDataOnPage();
 
 };
-
 // Call the init processes after the window loads
 window.onload = function(){
   app.init();
