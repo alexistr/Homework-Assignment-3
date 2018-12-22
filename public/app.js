@@ -82,6 +82,18 @@ app.client.request = function(headers,path,method,queryStringObject,payload,call
 
 };
 
+//Configure application with value from backend
+app.configureApp = function() {
+  app.client.request(undefined,'api/config','get',null,null,function(statusCode,response) {
+    if(statusCode==200 && response) {
+      app.config.stripePublic = response.stripePublic;
+    } else {
+      // Log the user out
+      app.logUserOut();
+    }
+  });
+};
+
 // Bind the logout button
 app.bindLogoutButton = function(){
   document.getElementById("logoutButton").addEventListener("click", function(e){
@@ -471,8 +483,41 @@ app.loadCartShowPage = function(){
             td1.innerHTML = item.price;
             td2.innerHTML = '<a href="#" name="cartLink" id="' + item.pizza + '">Delete</a>';
             });
-
+            //Add delete link
             app.deleteItemFromCart();
+
+            // Calculate amount to charge
+            let amount = cartContent.reduce(function(total,item) {
+              return total += item.price;
+              }
+              ,0
+            );
+
+            //configure stripe checkout button
+            var handler = StripeCheckout.configure({
+              key: app.config.stripePublic,
+              image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+              locale: 'auto',
+              token: function(token) {
+                app.charge(token.id);
+              }
+            });
+
+            document.getElementById('customButton').addEventListener('click', function(e) {
+              // Open Checkout with further options:
+              handler.open({
+                name: 'DonPietroPizza',
+                description: '2 widgets',
+                amount: amount*100,
+                currency: 'try'
+              });
+              e.preventDefault();
+            });
+
+            // Close Checkout on page navigation:
+            window.addEventListener('popstate', function() {
+              handler.close();
+            });
         }
       } else {
         // If the request comes back as something other than 200, log the user our (on the assumption that the api is temporarily down or the users token is bad)
@@ -493,7 +538,7 @@ app.tokenRenewalLoop = function(){
         console.log("Token renewed successfully @ "+Date.now());
       }
     });
-  },1000 * 60);
+  },1000 * 120);
 };
 
 // Shopping Logic
@@ -583,9 +628,23 @@ app.deleteItemFromCart = function() {  //Check we can acces the needed args (ema
   app.logUserOut();
 }
 };
+
+app.charge = function(stripeToken) {
+  let payload = {"email": app.config.sessionToken.email,"stripeToken": stripeToken};
+  app.client.request(undefined,'api/order','post',null,payload,function(statusCode,response) {
+    if(statusCode==200) {
+      window.location = '/';
+    } else {
+      console.log( payload);
+      console.log( statusCode);
+      console.log( response);
+    }
+  });
+};
 // Init (bootstrapping)
 app.init = function(){
-
+  // Configure app
+  app.configureApp();
   // Bind all form submissions
   app.bindForms();
 

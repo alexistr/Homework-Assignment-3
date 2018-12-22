@@ -1,10 +1,21 @@
-<h1>Your cart</h1>
-<hr />
+<form id="cartShow">
+  <h1>Your cart</h1>
+  <hr />
 
-<table id="cartTable">
-  <tr>
-    <th>pizza</th>
-    <th>Price</th>
-    <th>Delete</th>
-  </tr>
-</table>
+  <div class="formError"></div>
+
+  <table id="cartTable">
+    <tr>
+      <th>pizza</th>
+      <th>Price</th>
+      <th>&nbsp;</th>
+    </tr>
+  </table>
+  <hr />
+
+  <script src="https://checkout.stripe.com/checkout.js"></script>
+
+  <div class="inputWrapper ctaWrapper">
+  <button id="customButton">Purchase</button>
+  </div>
+</form>
