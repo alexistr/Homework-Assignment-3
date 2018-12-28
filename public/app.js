@@ -88,8 +88,7 @@ app.configureApp = function() {
     if(statusCode==200 && response) {
       app.config.stripePublic = response.stripePublic;
     } else {
-      // Log the user out
-      app.logUserOut();
+      console.log("Can't get app congig - please configure");
     }
   });
 };
@@ -193,7 +192,7 @@ app.bindForms = function(){
 
         // Call the API
 
-        app.client.request(headers,path,method,queryStringObject,payload,function(statusCode,responsePayload){
+        app.client.request(undefined,path,method,queryStringObject,payload,function(statusCode,responsePayload){
           // Display an error on the form if needed
           if(statusCode !== 200){
 
@@ -268,17 +267,6 @@ app.formResponseProcessor = function(formId,requestPayload,responsePayload){
     app.logUserOut(false);
     window.location = '/account/deleted';
   }
-
-  // If the user just created a new check successfully, redirect back to the dashboard
-  if(formId == 'checksCreate'){
-    window.location = '/checks/all';
-  }
-
-  // If the user just deleted a check, redirect them to the dashboard
-  if(formId == 'checksEdit2'){
-    window.location = '/checks/all';
-  }
-
 };
 
 // Get the session token from localstorage and set it in the app.config object
@@ -664,6 +652,7 @@ app.charge = function(stripeToken) {
 app.init = function(){
   // Configure app
   app.configureApp();
+
   // Bind all form submissions
   app.bindForms();
 

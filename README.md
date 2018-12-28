@@ -1,18 +1,40 @@
-# Homework-Assignment-2
-API for a pizza-delivery company
-
+# Homework-Assignment-3
 
 # Configuration
 Pease rename lib/config.js-CHANGE_ME to lib/config.js and replace
 YOUR_STRIPE_SECRET_KEY,
+YOUR_STRIPE_PUB_KEY,
 YOUR_MAILGUN_DOMAIN,
 YOUR_MAILGUN_API_KEY,
 with your own values.
 
+
 The menu is hard coded in lib/menu.js.
 Obviously you'll need a stripe and a mailgun account.
 
-start the API with node index.js then you can :
+# GUI navigation ###
+
+## Signup
+### Create an account & login
+
+## Login
+### Login to an existing account
+
+
+## Account Settings (must be loggedin)
+### Modify / Delete your account
+
+
+## Menu (must be loggedin)
+### Show the menu / put pizza in your cart
+
+
+## Your cart (must be loggedin)
+### View / remove pizza from your cart and pay
+
+
+
+### API documentation ###
 
 # Users
 ## Create user:
@@ -91,3 +113,8 @@ Required data: email,stripeToken (use tok_visa for testing) (+authorization toke
 ### url: /api/order
 ### method: GET
 Required data: email (+authorization token)
+
+# Config
+### url: /api/config
+### method: GET
+Required data: none
