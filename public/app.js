@@ -134,17 +134,14 @@ app.logUserOut = function(redirectUser){
 // Bind the forms
 app.bindForms = function(){
   if(document.querySelector("form")){
-
     var allForms = document.querySelectorAll("form");
     for(var i = 0; i < allForms.length; i++){
         allForms[i].addEventListener("submit", function(e){
-
         // Stop it from submitting
         e.preventDefault();
         var formId = this.id;
         var path = this.action;
         var method = this.method.toUpperCase();
-
         // Hide the error message (if it's currently shown due to a previous error)
         document.querySelector("#"+formId+" .formError").style.display = 'none';
 
@@ -165,7 +162,7 @@ app.bindForms = function(){
             var elementIsChecked = elements[i].checked;
             // Override the method of the form if the input's name is _method
             var nameOfElement = elements[i].name;
-            if(nameOfElement == '_method'){
+          if(nameOfElement == '_method'){
               method = valueOfElement;
             } else {
               // Create an payload field named "method" if the elements name is actually httpmethod
@@ -195,7 +192,8 @@ app.bindForms = function(){
         var queryStringObject = method == 'DELETE' ? payload : {};
 
         // Call the API
-        app.client.request(undefined,path,method,queryStringObject,payload,function(statusCode,responsePayload){
+
+        app.client.request(headers,path,method,queryStringObject,payload,function(statusCode,responsePayload){
           // Display an error on the form if needed
           if(statusCode !== 200){
 
@@ -398,7 +396,7 @@ app.loadAccountEditPage = function(){
         document.querySelector("#accountEdit1 .displayEmailInput").value = responsePayload.email;
 
         // Put the hidden email field into both forms
-        var hiddenEmailInputs = document.querySelectorAll("input.hiddenEmailNumberInput");
+        var hiddenEmailInputs = document.querySelectorAll("input.hiddenEmailInput");
         for(var i = 0; i < hiddenEmailInputs.length; i++){
             hiddenEmailInputs[i].value = responsePayload.email;
         }
@@ -565,7 +563,7 @@ app.addItem = function() {
           app.client.request(undefined,'api/shopping','POST',undefined,payload,function(statusCode,responsePayload){
             // Display an error on the form if needed
             if(statusCode == 200){
-
+              app.showItemNumber();
             } else {
 
             }
@@ -629,6 +627,27 @@ app.deleteItemFromCart = function() {  //Check we can acces the needed args (ema
 }
 };
 
+app.showItemNumber = function() {
+  // Get the email from the current token
+  var email = typeof(app.config.sessionToken.email) == 'string' ? app.config.sessionToken.email : false;
+  if(email){
+    // Fetch the user data
+    var queryStringObject = {
+      'email' : email
+    };
+    app.client.request(undefined,'api/users','GET',queryStringObject,undefined,function(statusCode,responsePayload){
+      if(statusCode == 200){
+        // Determine how many item user has chosen
+        var cartContent = typeof(responsePayload.cart) == 'object' && responsePayload.cart instanceof Array && responsePayload.cart.length > 0 ? responsePayload.cart : [];
+        var itemNumberElm = document.getElementById('itemNumber');
+        itemNumberElm.innerHTML = cartContent.length > 0 ? '('+cartContent.length+')' : '';
+      } else {
+        console.log("Can't get cart content");
+      }
+    });
+  }
+};
+
 app.charge = function(stripeToken) {
   let payload = {"email": app.config.sessionToken.email,"stripeToken": stripeToken};
   app.client.request(undefined,'api/order','post',null,payload,function(statusCode,response) {
@@ -653,6 +672,9 @@ app.init = function(){
 
   // Get the token from localstorage
   app.getSessionToken();
+
+  // Show number of pizzas in the user cart
+  app.showItemNumber();
 
   // Renew token
   app.tokenRenewalLoop();
